@@ -1,0 +1,25 @@
+{%  extends 'base.html.twig' %}
+
+{% block body %}
+
+    <h1>Recipe LIST page</h1>
+
+    <ul>
+        {%  for recipe in recipes  %}
+            <li>
+                id = {{ recipe.id }}
+                <br>
+                title = {{ recipe.title }}
+                <br>
+                listOfIngredients = {{ recipe.listOfIngredients }}
+                <br>
+                <a href = "{{ url('recipe_show', {id: recipe.id}) }}">(details)</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <hr>
+    <a href="{{ path('recipe_new_form') }}">
+        Create New Recipe
+    </a>
+{% endblock %}
