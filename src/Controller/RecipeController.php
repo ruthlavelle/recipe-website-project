@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Recipe;
+use App\Entity\User;
 use App\Form\RecipeType;
 use App\Repository\RecipeRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -11,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 
 class RecipeController extends Controller
@@ -24,11 +26,16 @@ class RecipeController extends Controller
         $recipe = new Recipe();
 
         $form = $this->createFormBuilder($recipe)
+            ->add('image', TextType::class)
             ->add('title', TextType::class)
             ->add('summary', TextType::class)
             ->add('tags', TextType::class)
             ->add('listOfIngredients', TextType::class)
             ->add('sequenceOfSteps', TextType::class)
+            ->add('user', EntityType::class, [
+                'class' => 'App:User' ,
+                'choice_label' => 'username',
+            ])
             ->add('save', SubmitType::class, array('label' => 'Create New Recipe'))->getForm();
 
         $argsArray = [
@@ -45,13 +52,15 @@ class RecipeController extends Controller
     public function processNewFormAction(Request $request)
     {
         //extract data from post values
+        $image = $request->request->get('image');
         $title = $request->request->get('title');
         $summary = $request->request->get('summary');
         $tags = $request->request->get('tags');
         $listOfIngredients = $request->request->get('listOfIngredients');
         $sequenceOfSteps= $request->request->get('sequenceOfSteps');
+        $user=$request->request->get('user');
 
-        //valid of none of the values are empty
+        //valid if none of the values are empty
         $isValid= !empty($title) && !empty($summary) && !empty($tags) && !empty($listOfIngredients) && !empty($sequenceOfSteps);
 
         if(!$isValid){
@@ -62,7 +71,7 @@ class RecipeController extends Controller
         }
 
         //forward to the createAction() method
-        return $this->createAction($title,$summary, $tags, $listOfIngredients, $sequenceOfSteps);
+        return $this->createAction($image, $title,$summary, $tags, $listOfIngredients, $sequenceOfSteps, $user);
     }
 
     /**
@@ -139,10 +148,11 @@ class RecipeController extends Controller
     /**
      * @Route("/recipe/update/{id}/{newTitle}/{newSummary}/{newTags}/{newListOfIngredients}/{newSequenceOfSteps}")
      */
-    public function updateAction(Recipe $recipe, $newTitle, $newSummary, $newTags, $newListOfIngredients, $newSequenceOfSteps)
+    public function updateAction(Recipe $recipe, $newImage, $newTitle, $newSummary, $newTags, $newListOfIngredients, $newSequenceOfSteps)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $recipe->setImage($newImage);
         $recipe->setTitle($newTitle);
         $recipe->setSummary($newSummary);
         $recipe->setTags($newTags);

@@ -9,10 +9,13 @@
             <li>
                 id = {{ recipe.id }}
                 <br>
+                image = {{ recipe.image }}
+                <br>
                 title = {{ recipe.title }}
                 <br>
                 listOfIngredients = {{ recipe.listOfIngredients }}
                 <br>
+                sequenceOfSteps = {{ recipe.sequenceOfSteps }}
                 <a href = "{{ url('recipe_show', {id: recipe.id}) }}">(details)</a>
             </li>
         {% endfor %}

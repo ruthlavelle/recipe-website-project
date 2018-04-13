@@ -27,6 +27,11 @@ class Recipe
     /**
      * @ORM\Column(type="string")
      */
+    private $image;
+
+    /**
+     * @ORM\Column(type="string")
+     */
     private $title;
 
     /**
@@ -49,6 +54,12 @@ class Recipe
      */
     private $sequenceOfSteps;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="recipes")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $user;
+
     public function getId()
     {
         return $this->id;
@@ -57,6 +68,16 @@ class Recipe
     public function setId($id): void
     {
         $this->id = $id;
+    }
+
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    public function setImage($image): void
+    {
+        $this->image = $image;
     }
 
 
@@ -110,6 +131,15 @@ class Recipe
     {
         $this->sequenceOfSteps = $sequenceOfSteps;
     }
+
+    public function getUser(): ?User
+    {
+       return $this->user;
+    }
+
+    public function  setUser($user = null)
+    {
+        $this->user = $user;
+    }
 }
 
-?>
