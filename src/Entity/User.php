@@ -16,7 +16,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @ORM\Table(name="app_users")
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
-class User
+class User implements UserInterface, \Serializable
 {
     /**
      * @ORM\Column(type="integer")
@@ -26,8 +26,24 @@ class User
     private $id;
 
     /**
-     * @return mixed
+     * @ORM\Column(type="string", length=25, unique=true)
      */
+    private $username;
+
+    /**
+     * @ORM\Column(type="string", length=64)
+     */
+    private $password;
+
+    /**
+     * @ORM\Column(type="json_array")
+     */
+    private $roles = [];
+
+
+
+
+
     public function getId()
     {
         return $this->id;
@@ -72,19 +88,7 @@ class User
     {
         $this->password = $password;
     }
-    /**
-     * @ORM\Column(type="string", length=25, unique=true)
-     */
-    private $username;
-    /**
-     * @ORM\Column(type="string", length=64)
-     */
-    private $password;
 
-    /**
-     * @ORM\Column(type="json_array")
-     */
-    private $roles = [];
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Recipe", mappedBy="user")
