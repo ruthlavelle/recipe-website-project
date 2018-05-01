@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Doctrine\ORM\Query\ResultSetMapping;
 
 
 class SecurityController extends Controller
@@ -41,36 +42,17 @@ class SecurityController extends Controller
     }
 
     /**
-     * @Route("/user/new", name="user_new_form")
+     * @Route("/user/processNewUserForm", name="user_process_new_form")
      */
-    public function newFormAction(Request $request)
-    {
-        $user = new User();
-
-        $form = $this->createFormBuilder($user)
-            ->add('username', TextType::class)
-            ->add('password', TextType::class)
-            ->add('save', SubmitType::class, array('label' => 'Create New User'))->getForm();
-
-        $argsArray = [
-            'form' => $form->createView(),
-        ];
-
-        $templateName='security/new';
-        return $this->render($templateName . '.html.twig', $argsArray);
-    }
-
-    /**
-     * @Route("/user/processNewForm", name="user_process_new_form")
-     */
-    public function processNewFormAction(Request $request)
+    public function processNewUserForm(Request $request)
     {
         //extract data from post values
         $username = $request->request->get('username');
         $password = $request->request->get('password');
+        $roles = $request->request->get('roles');
 
         //valid if none of the values are empty
-        $isValid= !empty($username) && !empty($password);
+        $isValid= !empty($username) && !empty($password) &&!empty($roles);
 
         if(!$isValid){
             $this->addFlash(
@@ -80,17 +62,21 @@ class SecurityController extends Controller
         }
 
         //forward to the createAction() method
-        return $this->createAction($username, $password);
+        return $this->createAction($username, $password, $roles);
     }
 
     /**
      * @Route("/user/new", name="user_new", methods={"POST", "GET"})
      */
-    public function newAction(Request $request)
+    public function newUser(Request $request)
     {
         $user = new User();
 
-        $form = $this->createForm(UserType::class, $user);
+        $form = $this->createFormBuilder($user)
+            ->add('username', TextType::class)
+            ->add('password', TextType::class)
+            ->add('roles', TextType::class)
+            ->add('save',SubmitType::class, array('label' => 'Create New User'))->getForm();
 
         $form->handleRequest($request);
 
@@ -98,7 +84,7 @@ class SecurityController extends Controller
             return $this->createAction($user);
         }
 
-        $template = 'user/new.html.twig';
+        $template = 'security/new.html.twig';
         $argsArray = [
             'form' => $form->createView(),
         ];
@@ -115,7 +101,28 @@ class SecurityController extends Controller
         $em->persist($user);
         $em->flush();
 
+
         return $this->listAction($user->getId());
+    }
+
+    /**
+     * @return Response
+     */
+    public function listAction()
+    {
+        $userRepository = $this->getDoctrine()->getRepository('App:User');
+        $users = $userRepository->createQuery(
+            'SELECT id, username FROM app_users ORDER BY id DESC'
+        );
+
+        $user = $query->setMaxResults(1)->getResult();
+
+        $template = 'security/list.html.twig';
+        $args = [
+            'users' => $users
+        ];
+
+        return $this ->render($template, $args);
     }
 
 }
