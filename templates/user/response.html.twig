@@ -1,0 +1,12 @@
+{%  extends 'base.html.twig' %}
+
+{%  block pageTitle %} Thank you for Creating a New User {% endblock %}
+
+{% block body %}
+    <h1>Please log in using the details associated with your newly created account</h1>
+    <br>
+    <a href="{{ path('login') }}">
+        Click here to log in
+    </a>
+
+{% endblock %}

@@ -10,7 +10,6 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Table(name="app_users")
@@ -35,11 +34,7 @@ class User implements UserInterface, \Serializable
      */
     private $password;
 
-    /**
-     * @ORM\Column(type="json_array")
-     */
-    private $roles = [];
-
+    private $plainPassword;
 
     public function getId()
     {
@@ -62,6 +57,16 @@ class User implements UserInterface, \Serializable
         $this->username = $username;
     }
 
+    public function getPlainPassword()
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword($plainPassword)
+    {
+        $this->plainPassword = $plainPassword;
+    }
+
     public function getPassword()
     {
         return $this->password;
@@ -72,20 +77,16 @@ class User implements UserInterface, \Serializable
         $this->password = $password;
     }
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Recipe", mappedBy="user")
-     */
-    private $recipes;
-
-    public function __construct()
-    {
-        $this->recipes = new ArrayCollection();
-    }
 
     public function getSalt()
     {
         // no salt needed since we are using bcrypt
         return null;
+    }
+
+    public function getRoles()
+    {
+        return array('ROLE_USER');
     }
 
     public function eraseCredentials()
@@ -109,22 +110,10 @@ class User implements UserInterface, \Serializable
             $this->id,
             $this->username,
             $this->password,
-            ) = unserialize($serialized);
+            ) = unserialize($serialized, ['allowed_classes' => false]);
     }
 
-    public function getRoles()
-    {
-        $roles = $this->roles;
-        // ensure always contains ROLE_USER
-        $roles = 'ROLE_USER';
-        return $roles;
-    }
 
-    public function setRoles($roles)
-    {
-        $this->roles = $roles;
-        return $this;
-    }
 
 
 
