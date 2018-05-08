@@ -6,95 +6,116 @@ use App\Entity\Recipe;
 use App\Entity\User;
 use App\Form\RecipeType;
 use App\Repository\RecipeRepository;
+use Doctrine\ORM\EntityRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
 
 class RecipeController extends Controller
 {
 
     /**
-     * @Route("/recipe/new", name="recipe_new_form")
+     * @Route("/recipe/new", name="recipe_new")
+     * @Method({"POST", "GET"})
+     * @Security("has_role('ROLE_USER')")
      */
-    public function newFormAction(Request $request)
+    public function newRecipe(Request $request, UserInterface $user)
     {
         $recipe = new Recipe();
+
+        $recipe->setUser($user);
 
         $form = $this->createFormBuilder($recipe)
-            ->add('image', TextType::class)
+            ->add('image', FileType::class, array('label' => 'Image (png, jpeg)'))
             ->add('title', TextType::class)
-            ->add('summary', TextType::class)
+            ->add('summary', TextareaType::class)
             ->add('tags', TextType::class)
-            ->add('listOfIngredients', TextType::class)
-            ->add('sequenceOfSteps', TextType::class)
-            ->add('user', EntityType::class, [
-                'class' => 'App:User' ,
-                'choice_label' => 'username',
-            ])
-            ->add('save', SubmitType::class, array('label' => 'Create New Recipe'))->getForm();
+            ->add('listOfIngredients', TextareaType::class)
+            ->add('sequenceOfSteps', TextareaType::class)
+            ->add('author', HiddenType::class, array(
+                    'data' => $user->getUsername(),
+                ))
+            ->add('save', SubmitType::class, array('label' => 'Create New Recipe'))
+            ->getForm();
 
-        $argsArray = [
-            'form' => $form->createView(),
-        ];
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()){
+            $file = $recipe->getImage();
+            $fileName = md5(uniqid()). '.' .$file->guessExtension();
+            $file->move($this->getParameter('image_directory'), $fileName);
+            $recipe->setImage($fileName);
 
-        $templateName='recipe/new';
-        return $this->render($templateName . '.html.twig', $argsArray);
-    }
+            $recipe = $form->getData();
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($recipe);
+            $em->flush();
 
-    /**
-     * @Route("/recipe/processNewForm", name="recipe_process_new_form")
-     */
-    public function processNewFormAction(Request $request)
-    {
-        //extract data from post values
-        $image = $request->request->get('image');
-        $title = $request->request->get('title');
-        $summary = $request->request->get('summary');
-        $tags = $request->request->get('tags');
-        $listOfIngredients = $request->request->get('listOfIngredients');
-        $sequenceOfSteps= $request->request->get('sequenceOfSteps');
-        $user=$request->request->get('user');
-
-        //valid if none of the values are empty
-        $isValid= !empty($title) && !empty($summary) && !empty($tags) && !empty($listOfIngredients) && !empty($sequenceOfSteps);
-
-        if(!$isValid){
-            $this->addFlash(
-                'error',
-                'None of these fields can be left empty'
-            );
+            return $this->redirectToRoute('recipe_list');
         }
 
-        //forward to the createAction() method
-        return $this->createAction($image, $title,$summary, $tags, $listOfIngredients, $sequenceOfSteps, $user);
+        return $this->render('recipe/new.html.twig', array(
+            'form' => $form->createView()
+        ));
     }
 
+
     /**
-     * @Route("/recipe/new", name="recipe_new", methods={"POST", "GET"})
+     * @Route("/recipe/edit/{id}", name="recipe_edit")
+     * methods={"POST", "GET"}
      */
-    public function newAction(Request $request)
+    public function editRecipe(Request $request, $id)
     {
         $recipe = new Recipe();
+        $recipe = $this->getDoctrine()->getRepository
+        (Recipe::class)->find($id);
+        $recipe->setImage(
+            new File($this->getParameter('image_directory'). '/' .$recipe->getImage())
+        );
 
-        $form = $this->createForm(RecipeType::class, $recipe);
+        $form = $this->createFormBuilder($recipe)
+            ->add('image', FileType::class, array('label' => 'Image (png, jpeg)'))
+            ->add('title', TextType::class)
+            ->add('summary', TextareaType::class)
+            ->add('tags', TextType::class)
+            ->add('listOfIngredients', TextareaType::class)
+            ->add('sequenceOfSteps', TextareaType::class)
+            ->add('user', TextType::class)
+            ->add('save', SubmitType::class, array('label' => 'Update Recipe'))
+            ->getForm();
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form -> isValid()){
-            return $this->createAction($recipe);
+
+        if ($form->isSubmitted() && $form->isValid()){
+            $file = $recipe->getImage();
+            $fileName = md5(uniqid()). '.' .$file->guessExtension();
+            $file->move($this->getParameter('image_directory'), $fileName);
+            $recipe->setImage($fileName);
+
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
+
+            return $this->redirectToRoute('recipe_list');
         }
 
-        $template = 'recipe/new.html.twig';
-        $argsArray = [
-            'form' => $form->createView(),
-        ];
-
-        return $this->render($template, $argsArray);
+        return $this->render('recipe/edit.html.twig', array(
+            'form' => $form->createView()
+        ));
     }
 
     /**
@@ -102,8 +123,9 @@ class RecipeController extends Controller
      */
     public function listAction()
     {
-        $recipeRepository = $this->getDoctrine()->getRepository('App:Recipe');
-        $recipes = $recipeRepository->findAll();
+        $recipes = $this->getDoctrine()
+            ->getRepository(Recipe::class)
+            ->findAll();
 
         $template = 'recipe/list.html.twig';
         $args = [
@@ -111,6 +133,17 @@ class RecipeController extends Controller
         ];
 
         return $this ->render($template, $args);
+    }
+
+    public function findOneByIdJoinedToCategory($recipeId)
+    {
+        return $this->createQueryBuilder('r')
+            ->innerJoin('r.user', 'u')
+            ->addSelect('u')
+            ->andWhere('r.id = :id')
+            ->setParaneter('id', $recipeId)
+            ->getQuery()
+            ->getAll();
     }
 
     /**
@@ -126,49 +159,27 @@ class RecipeController extends Controller
     }
 
     /**
-     * @Route("/recipe/delete/{id}")
+     * @Route("/recipe/delete/{id}", name="delete_recipe")
      */
-    public function deleteAction(Recipe $recipe)
+    public function delete(Request $request, $id)
     {
-        //entity manager
+        $recipe = $this->getDoctrine()->getRepository
+        (Recipe::class)->find($id);
+
         $em = $this->getDoctrine()->getManager();
-
-        //Store id before deleting
-        $id = $recipe->getId();
-
-        //tell doctrine to delete student
         $em->remove($recipe);
-
-        //execute
         $em->flush();
 
-        return new Response('Deleted Recipe with ID: ' .$id);
+        return $this->redirectToRoute('recipe_list');
     }
 
-    /**
-     * @Route("/recipe/update/{id}/{newTitle}/{newSummary}/{newTags}/{newListOfIngredients}/{newSequenceOfSteps}")
-     */
-    public function updateAction(Recipe $recipe, $newImage, $newTitle, $newSummary, $newTags, $newListOfIngredients, $newSequenceOfSteps)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        $recipe->setImage($newImage);
-        $recipe->setTitle($newTitle);
-        $recipe->setSummary($newSummary);
-        $recipe->setTags($newTags);
-        $recipe->setListOfIngredients($newListOfIngredients);
-        $recipe->setSequenceOfSteps($newSequenceOfSteps);
-        $em->flush();
-
-        return $this->redirectToRoute('student_show', ['id' => $recipe->getId()]);
-    }
 
     /**
      * @Route ("/recipe/{id}", name="recipe_show")
      */
     public function showAction(Recipe $recipe)
     {
-        $template = 'recipe/index.html.twig';
+        $template = 'recipe/show.html.twig';
 
         $args = [
             'recipe' => $recipe
@@ -179,6 +190,26 @@ class RecipeController extends Controller
         }
 
         return $this->render($template, $args);
+    }
+
+    /**
+     * @Route ("/collections", name="my_collection")
+     */
+    public function myCollection(UserInterface $user)
+    {
+        $id = $user->getId();
+
+        $user = $this->getDoctrine()
+            ->getRepository(User::class)
+            ->find($id);
+
+        $recipes = $user->getRecipes();
+
+        $args = [
+            'recipes' => $recipes
+        ];
+
+        return $this->render('recipe/collection.html.twig', $args);
     }
 
 

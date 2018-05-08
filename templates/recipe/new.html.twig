@@ -1,8 +1,9 @@
 {%  extends 'base.html.twig' %}
 
-{%  block pageTitle %} Add New Recipe {% endblock %}
+{%  block pageTitle %} New Recipe {% endblock %}
 
 {% block body %}
-    <h1>Create a New Recipe</h1>
-    {{ form(form) }}
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    {{ form_end(form) }}
 {% endblock %}

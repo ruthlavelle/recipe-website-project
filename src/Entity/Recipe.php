@@ -9,11 +9,11 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\RecipeRepository")
  */
-
 
 class Recipe
 {
@@ -26,8 +26,10 @@ class Recipe
 
     /**
      * @ORM\Column(type="string")
+     * @Assert\File(mimeTypes={"image/png", "image/jpeg"})
      */
     private $image;
+
 
     /**
      * @ORM\Column(type="string")
@@ -56,9 +58,40 @@ class Recipe
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="recipes")
-     * @ORM\JoinColumn(nullable=true)
+     * @ORM\JoinColumn(nullable=false)
      */
     private $user;
+
+    /**
+     * @ORM\Column(type="string")
+     */
+    private $author;
+
+    /**
+     * @return mixed
+     */
+    public function getAuthor()
+    {
+        return $this->author;
+    }
+
+    /**
+     * @param mixed $author
+     */
+    public function setAuthor($author): void
+    {
+        $this->author = $author;
+    }
+
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    public function setImage($image)
+    {
+        $this->image = $image;
+    }
 
     public function getId()
     {
@@ -68,16 +101,6 @@ class Recipe
     public function setId($id): void
     {
         $this->id = $id;
-    }
-
-    public function getImage()
-    {
-        return $this->image;
-    }
-
-    public function setImage($image): void
-    {
-        $this->image = $image;
     }
 
 
@@ -137,9 +160,11 @@ class Recipe
        return $this->user;
     }
 
-    public function  setUser($user = null)
+    public function  setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
     }
 }
 

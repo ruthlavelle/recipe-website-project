@@ -1,28 +1,37 @@
 {%  extends 'base.html.twig' %}
 
+{% block title %}List of Recipes{% endblock %}
+
 {% block body %}
 
-    <h1>Recipe LIST page</h1>
+    {% if recipes %}
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>More Details</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for recipe in recipes %}
+            <tr>
+                <td>{{ recipe.title }}</td>
+                <td> {{ recipe.author }} </td>
+                <td>
+                    <a href = "{{ url('recipe_show', {id: recipe.id}) }}" class="btn btn-dark">Show</a>
+                </td>
+                <td>
+                    <a href = "{{ url('recipe_edit', {id: recipe.id}) }}" class="btn btn-light">Edit</a>
+                    <a href = "{{ url('delete_recipe', {id: recipe.id}) }}" class="btn btn-danger delete-recipe">Delete</a>
+                </td>
 
-    <ul>
-        {%  for recipe in recipes  %}
-            <li>
-                id = {{ recipe.id }}
-                <br>
-                image = {{ recipe.image }}
-                <br>
-                title = {{ recipe.title }}
-                <br>
-                listOfIngredients = {{ recipe.listOfIngredients }}
-                <br>
-                sequenceOfSteps = {{ recipe.sequenceOfSteps }}
-                <a href = "{{ url('recipe_show', {id: recipe.id}) }}">(details)</a>
-            </li>
-        {% endfor %}
-    </ul>
-
-    <hr>
-    <a href="{{ path('recipe_new_form') }}">
-        Create New Recipe
-    </a>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p>No Recipes to Display</p>
+        {% endif %}
 {% endblock %}

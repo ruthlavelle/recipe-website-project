@@ -1,4 +1,7 @@
 {
+    "behat/transliterator": {
+        "version": "v1.2.0"
+    },
     "composer/ca-bundle": {
         "version": "1.1.1"
     },
@@ -86,6 +89,9 @@
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
     },
+    "jms/metadata": {
+        "version": "1.6.0"
+    },
     "koff/crud-maker-bundle": {
         "version": "v1.1"
     },
@@ -127,6 +133,9 @@
             "version": "4.0",
             "ref": "e65a105bf4cd5b1b79012ba029954927f05922e8"
         }
+    },
+    "symfony/asset": {
+        "version": "v4.0.9"
     },
     "symfony/cache": {
         "version": "v4.0.6"
@@ -293,6 +302,9 @@
     "symfony/stopwatch": {
         "version": "v4.0.6"
     },
+    "symfony/templating": {
+        "version": "v4.0.9"
+    },
     "symfony/translation": {
         "version": "3.3",
         "recipe": {
@@ -343,6 +355,15 @@
     },
     "twig/twig": {
         "version": "v2.4.7"
+    },
+    "vich/uploader-bundle": {
+        "version": "1.5",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "1.5",
+            "ref": "c4f5755b37fb65b9c6a3cbdae91205c15a137ed4"
+        }
     },
     "zendframework/zend-code": {
         "version": "3.3.0"
