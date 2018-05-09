@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Recipe;
 use App\Entity\User;
+use App\Entity\Comment;
 use App\Form\RecipeType;
 use App\Repository\RecipeRepository;
 use Doctrine\ORM\EntityRepository;
@@ -24,6 +25,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 
 class RecipeController extends Controller
@@ -78,9 +80,11 @@ class RecipeController extends Controller
      * @Route("/recipe/edit/{id}", name="recipe_edit")
      * methods={"POST", "GET"}
      */
-    public function editRecipe(Request $request, $id)
+    public function editRecipe(Request $request, $id, UserInterface $user)
     {
         $recipe = new Recipe();
+        $recipe->setUser($user);
+
         $recipe = $this->getDoctrine()->getRepository
         (Recipe::class)->find($id);
         $recipe->setImage(
@@ -94,8 +98,10 @@ class RecipeController extends Controller
             ->add('tags', TextType::class)
             ->add('listOfIngredients', TextareaType::class)
             ->add('sequenceOfSteps', TextareaType::class)
-            ->add('user', TextType::class)
-            ->add('save', SubmitType::class, array('label' => 'Update Recipe'))
+            ->add('author', HiddenType::class, array(
+                'data' => $user->getUsername(),
+            ))
+            ->add('save', SubmitType::class, array('label' => 'Create New Recipe'))
             ->getForm();
 
         $form->handleRequest($request);
@@ -135,16 +141,6 @@ class RecipeController extends Controller
         return $this ->render($template, $args);
     }
 
-    public function findOneByIdJoinedToCategory($recipeId)
-    {
-        return $this->createQueryBuilder('r')
-            ->innerJoin('r.user', 'u')
-            ->addSelect('u')
-            ->andWhere('r.id = :id')
-            ->setParaneter('id', $recipeId)
-            ->getQuery()
-            ->getAll();
-    }
 
     /**
      * @Route("/recipe/create/{title}/{summary}/{tags}/{listOfIngredients}/{sequenceOfSteps}")
@@ -211,6 +207,63 @@ class RecipeController extends Controller
 
         return $this->render('recipe/collection.html.twig', $args);
     }
+
+    /**
+     * @Route("/new/comment/{id}", name="new_comment")
+     * @Method({"GET", "POST"})
+     * @Security("has_role('ROLE_USER')")
+     */
+    public function newComment(UserInterface $user, Recipe $recipe, Request $request)
+    {
+        $comment = new Comment();
+        $comment->setUser($user);
+        $comment->setRecipe($recipe);
+
+        $form = $this->createFormBuilder($comment)
+            ->add('comment', TextareaType::class)
+            ->add('author', HiddenType::class, array(
+                'data' => $user->getUsername(),
+            ))
+            ->add('save', SubmitType::class, array('label' => 'Save Comment'))
+            ->getForm();
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()){
+
+            $comment = $form->getData();
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($comment);
+            $em->flush();
+
+            return $this->redirectToRoute('recipe_list');
+        }
+
+        return $this->render('comment/new.html.twig', array(
+            'form' => $form->createView()
+        ));
+    }
+
+    /**
+     * @Route ("/comments/{id}", name="recipe_comments", methods={"GET"})
+     */
+    public function recipeComments(Recipe $recipe)
+    {
+        $id = $recipe->getId();
+
+        $comments = $this->getDoctrine()
+            ->getRepository(Comment::class)
+            ->find($id);
+
+        $comments = $recipe->getComments();
+
+        $args = [
+            'comments' => $comments
+        ];
+
+        return $this->render('comment/show.html.twig', $args);
+    }
+
+
 
 
 }

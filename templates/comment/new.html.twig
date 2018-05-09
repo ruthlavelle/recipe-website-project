@@ -3,13 +3,7 @@
 {% block title %}New Comment{% endblock %}
 
 {% block body %}
-
-    <h1>Create new Comment</h1>
-
-    {% include 'comment/_form.html.twig' with {'form': form} only %}
-
-    {% if is_granted("ROLE_USER") %}
-        username of logged-in user = {{ app.user.username }}
-        {% endif %}
-
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    {{ form_end(form) }}
 {% endblock %}

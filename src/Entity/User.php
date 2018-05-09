@@ -43,10 +43,25 @@ class User implements UserInterface, \Serializable
      */
     private $recipes;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="category")
+     */
+    private $comments;
+
     public function __construct()
     {
+        $this->comments = new ArrayCollection();
         $this->recipes = new ArrayCollection();
     }
+
+    /**
+     * @return Collection/Comment[]
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
 
     /**
      * @return Collection/Recipe[]
