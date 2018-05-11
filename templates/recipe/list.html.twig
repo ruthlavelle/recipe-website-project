@@ -8,13 +8,6 @@
         <table class="table table-striped">
             <thead>
             <tr>
-                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>More Details</th>
-                    <th>Comments</th>
-                    <th>Actions</th>
-                {%  else %}
                     <th>Title</th>
                     <th>Author</th>
                     <th>More Details</th>
@@ -26,7 +19,6 @@
             <tbody>
             {% for recipe in recipes %}
             <tr>
-                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                 <td>{{ recipe.title }}</td>
                 <td> {{ recipe.author }} </td>
                 <td>
@@ -34,22 +26,9 @@
                 </td>
                 <td>
                     <a href = "{{ url('recipe_comments', {'id': recipe.id}) }}" class="btn btn-info">View</a>
+                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                     <a href = "{{ url('new_comment', {'id': recipe.id}) }}" class="btn btn-success">New</a>
-                </td>
-                <td>
-                    <a href = "{{ url('recipe_edit', {id: recipe.id}) }}" class="btn btn-success">Edit</a>
-                    <a href = "{{ url('delete_recipe', {id: recipe.id}) }}" class="btn btn-danger delete-recipe">Delete</a>
-                </td>
-
-                {% else %}
-
-                <td>{{ recipe.title }}</td>
-                <td> {{ recipe.author }} </td>
-                <td>
-                    <a href = "{{ url('recipe_show', {id: recipe.id}) }}" class="btn btn-info">Show</a>
-                </td>
-                <td>
-                    <a href = "{{ url('recipe_comments', {'id': recipe.id}) }}" class="btn btn-info">Show</a>
+                {% endif %}
                 </td>
             </tr>
             {% endif %}
