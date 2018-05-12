@@ -10,7 +10,7 @@ class AdminController extends Controller
 {
     /**
      * @Route("/admin", name="admin")
-     * @Security("has_role('ROLE_USER')")
+     * @Security("has_role('ROLE_ADMIN')")
      */
     public function index()
     {
