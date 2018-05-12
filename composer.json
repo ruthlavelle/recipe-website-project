@@ -57,6 +57,7 @@
         "symfony/polyfill-php56": "*"
     },
     "scripts": {
+        "run": "php bin/console server:run",
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install --symlink --relative %PUBLIC_DIR%": "symfony-cmd",
