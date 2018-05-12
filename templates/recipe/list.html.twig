@@ -3,7 +3,6 @@
 {% block title %}List of Recipes{% endblock %}
 
 {% block body %}
-
     {% if recipes %}
         <table class="table table-striped">
             <thead>
@@ -14,7 +13,6 @@
                     <th>Comments</th>
             </tr>
             </thead>
-
             <tbody>
             {% for recipe in recipes %}
             <tr>
@@ -25,19 +23,15 @@
                 </td>
                 <td>
                     <a href = "{{ url('recipe_comments', {'id': recipe.id}) }}" class="btn btn-info">View</a>
-
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                     <a href = "{{ url('new_comment', {'id': recipe.id}) }}" class="btn btn-success">New</a>
                 {% endif %}
-
+            {% endfor %}
                 </td>
             </tr>
-        {% endfor %}
-    {% endif %}
             </tbody>
         </table>
     {% else %}
         <p>No Recipes to Display</p>
     {% endif %}
-
 {% endblock %}
