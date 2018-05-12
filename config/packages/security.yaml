@@ -1,14 +1,11 @@
 security:
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+
     providers:
-      chain_provider:
-        chain:
-          providers: [in_memory, our_db_provider]
-      in_memory:
-        memory:
-          users:
-            admin: {password: admin, roles: 'ROLE_ADMIN'}
       our_db_provider:
-        entity: {class: App\Entity\User, property: username}
+        entity:
+          class: App\Entity\User
+          property: username
 
     encoders:
       App\Entity\User:
