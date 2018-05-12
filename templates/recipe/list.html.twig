@@ -11,7 +11,7 @@
                     <th>Title</th>
                     <th>Author</th>
                     <th>More Details</th>
-                    <th>Comments</th
+                    <th>Comments</th>
             </tr>
             </thead>
 
@@ -25,18 +25,20 @@
                 </td>
                 <td>
                     <a href = "{{ url('recipe_comments', {'id': recipe.id}) }}" class="btn btn-info">View</a>
+
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                     <a href = "{{ url('new_comment', {'id': recipe.id}) }}" class="btn btn-success">New</a>
                 {% endif %}
+
                 </td>
             </tr>
-            {% endif %}
         {% endfor %}
             </tbody>
         </table>
+    {% endif %}
 
-        {% else %}
-            <p>No Recipes to Display</p>
-        {% endif %}
+    {% else %}
+        <p>No Recipes to Display</p>
+    {% endif %}
 
 {% endblock %}
