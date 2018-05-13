@@ -12,9 +12,10 @@ use Doctrine\Common\Collections\Collection;
  */
 class Comment
 {
+
     /**
      * @ORM\Id
-     * @ORM\GeneratedValue
+     * @ORM\GeneratedValue strategy="auto"
      * @ORM\Column(type="integer")
      */
     private $id;
