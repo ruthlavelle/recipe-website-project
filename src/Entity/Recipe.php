@@ -39,22 +39,22 @@ class Recipe
     private $title;
 
     /**
-     * @ORM\Column(type="text", length=65535)
+     * @ORM\Column(type="text")
      */
     private $summary;
 
     /**
-     * @ORM\Column(type="text", length=65535)
+     * @ORM\Column(type="text")
      */
     private $tags;
 
     /**
-     * @ORM\Column(type="text", length=65535)
+     * @ORM\Column(type="text")
      */
     private $listOfIngredients;
 
     /**
-     * @ORM\Column(type="text", length=65535)
+     * @ORM\Column(type="text")
      */
     private $sequenceOfSteps;
 

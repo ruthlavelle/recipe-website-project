@@ -15,13 +15,13 @@ class Comment
 
     /**
      * @ORM\Id
-     * @ORM\GeneratedValue strategy="auto"
+     * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
     private $id;
 
     /**
-     * @ORM\Column(type="text", length=65535)
+     * @ORM\Column(type="text")
      */
     private $comment;
 
