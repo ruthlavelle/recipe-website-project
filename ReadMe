@@ -1,0 +1,25 @@
+This is a recipe website where you can add recipes to your own collection.
+
+User details are as follows:
+
+ROLE_USER:
+Username: ruthlavelle
+Password: ruthlavelle
+
+Username: bertieahern
+Password: bertieahern
+
+If logged in as a user, you can:
+->add a new recipe
+->edit a recipe in your collection
+->Delete a recipe in your collection
+->Add a comment to any recipe
+
+ROLE_ADMIN:
+Username: admin
+Password: admin
+
+As an admin, you can add and delete any recipe or user
+
+ROLE_ANON
+->Without logging in you can see list of recipes and aslo create an account for yourself
