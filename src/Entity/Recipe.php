@@ -27,34 +27,34 @@ class Recipe
     private $id;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="text")
      * @Assert\File(mimeTypes={"image/png", "image/jpeg"})
      */
     private $image;
 
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="text")
      */
     private $title;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", length=65535)
      */
     private $summary;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="text", length=65535)
      */
     private $tags;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", length=65535)
      */
     private $listOfIngredients;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", length=65535)
      */
     private $sequenceOfSteps;
 
