@@ -48,10 +48,6 @@ class User implements UserInterface, \Serializable
      */
     private $comments;
 
-    /**
-     * @ORM\Column(type="json_array")
-     */
-    private $roles;
 
     public function __construct()
     {
@@ -127,11 +123,6 @@ class User implements UserInterface, \Serializable
     public function getRoles()
     {
         return array('ROLE_USER');
-    }
-
-    public function setRoles($roles): void
-    {
-        $this->roles = $roles;
     }
 
     public function eraseCredentials()

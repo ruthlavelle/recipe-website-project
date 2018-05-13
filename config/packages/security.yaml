@@ -1,13 +1,22 @@
 security:
-    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
-
     providers:
+      chain_provider:
+        chain:
+          providers: [in_memory, our_db_provider]
+      in_memory:
+        memory:
+          users:
+            admin:
+              password: $2y$13$2BdNQgMH9Wmz9zuyX3CxbO73.8/VOauT8UXrc9TSh2tyfUKTZHw.C
+              roles: 'ROLE_ADMIN'
       our_db_provider:
         entity:
           class: App\Entity\User
           property: username
 
     encoders:
+      Symfony\Component\Security\Core\User\User:
+        algorithm: bcrypt
       App\Entity\User:
         algorithm: bcrypt
 
@@ -17,8 +26,8 @@ security:
             security: false
         main:
             anonymous: true
-            provider: our_db_provider
             form_login:
+              provider: chain_provider
               login_path: login
               check_path: login
               csrf_token_generator: security.csrf.token_manager

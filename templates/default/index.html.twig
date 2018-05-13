@@ -4,6 +4,14 @@
 
 {% block body %}
 
-    Welcome
+    <h1>Welcome to the Recipes Website!</h1><br><br>
+
+<p>You can use the navigation bar to complete various tasks on this website. You must be logged in to complete some tasks - for example, to create a recipe, or
+    to edit and delete recipes in your collection.</p>
+
+    <p>You can use the link below to login. Alternatively, please create a new account to begin adding recipes.</p><br>
+
+    <p><a href="{{ url('login') }}" class="btn btn-info">Login</a> </p><br>
+    <p><a href="{{ url('user_registration') }}" class="btn btn-info">Create an Account</a>
 
 {% endblock %}
