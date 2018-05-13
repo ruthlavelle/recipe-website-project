@@ -39,7 +39,7 @@ class Recipe
     private $title;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="text")
      */
     private $summary;
 
@@ -49,12 +49,12 @@ class Recipe
     private $tags;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="text")
      */
     private $listOfIngredients;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="text")
      */
     private $sequenceOfSteps;
 
